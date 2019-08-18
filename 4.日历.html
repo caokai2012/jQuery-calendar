@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        
+        #wrapper {
+            width: 300px;
+            margin: 20px auto;
+        }
+        
+        #wrapper .title {
+            background-color: #17a4eb;
+            color: #fff;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            font-size: 16px;
+        }
+        
+        #wrapper .title .prev {
+            float: left;
+        }
+        
+        #wrapper .title .next {
+            float: right;
+        }
+        
+        #wrapper .title strong {
+            font-size: 14px;
+        }
+        
+        #wrapper table {
+            border-collapse: collapse;
+            width: 300px;
+            font-size: 12px;
+        }
+        
+        #wrapper th.red {
+            color: #f00;
+        }
+        
+        #wrapper td {
+            text-align: center;
+        }
+        
+        #wrapper th,
+        td {
+            padding: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrapper">
+        <!-- <p class="title">
+            <span class="prev">上个月</span>
+            <span class="next">下个月</span>
+            <strong>2019年5月</strong>
+        </p>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th class="red">周日</th>
+                    <th>周一</th>
+                    <th>周二</th>
+                    <th>周三</th>
+                    <th>周四</th>
+                    <th>周五</th>
+                    <th class="red">周六</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                </tr>
+            </tbody>
+        </table> -->
+    </div>
+    <script src="jquery.js"></script>
+    <script>
+        $(function() {
+            $.fn.extend({
+                // 用户设置项
+                data: function(options) {
+                    var $that = $(this);
+                    create();
+
+                    // 默认设置
+                    var setting = {
+                        year: new Date().getFullYear(),
+                        month: new Date().getMonth() + 1
+                    };
+
+                    if (options) {
+                        // 合拼  默认设置对象和 用户设置对象
+                        setting = $.extend({}, setting, options);
+                    }
+
+                    show(setting.year, setting.month);
+
+                    // 创建 基本  table  结构
+                    function create() {
+                        // 创建p 标签
+                        var $p = $("<p>/").addClass("title");
+                        var s1 = $("<span/>").text("上个月").addClass("prev");
+                        var s2 = $("<span/>").text("下个月").addClass("next");
+                        var s3 = $("<strong/>").text("2019年5月");
+                        $p.append(s1).append(s2).append(s3);
+                        $that.append($p);
+
+                        //点击上个月的点击事件
+                        s1.click(function() {
+                            setting.month--;
+                            if (setting.month < 1) {
+                                setting.month = 12;
+                                setting.year--;
+                            }
+                            show(setting.year, setting.month);
+                        });
+
+                        // 下个月  点击事件
+                        s2.click(function() {
+                            setting.month++;
+                            if (setting.month > 12) {
+                                setting.month = 1;
+                                setting.year++;
+                            }
+                            show(setting.year, setting.month);
+                        });
+
+                        // 创建表格
+                        // var tab = $('<table border="1"><thead > <tr><th class = "red" > 周日 </th> <th> 周一 </th> <th> 周二 </th> <th> 周三 </th> <th> 周四 </th> <th > 周五 </th> <th class = "red" > 周六 </th> </tr></thead><tbody></tbody></table >');
+                        var a = "星期天";
+                        // es6 模板字符串 ${a}  作为变量来解析
+                        var tab = $(`<table border="1">
+                                        <thead>
+                                            <tr>
+                                                <th class="red">周日</th>
+                                                <th>周一</th>
+                                                <th>周二</th>
+                                                <th>周三</th>
+                                                <th>周四</th>
+                                                <th>周五</th>
+                                                <th class="red">周六</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>`);
+
+
+                        for (var i = 0; i < 6; i++) {
+                            var $tr = $("<tr/>");
+                            for (var j = 0; j < 7; j++) {
+                                $("<td/>").appendTo($tr);
+                            }
+                            tab.find("tbody").append($tr);
+                        }
+                        $that.append(tab);
+                    };
+
+
+
+                    /*
+                        根据月份渲染日历的函数
+                        year: 年份
+                        month:月份
+                    */
+                    function show(year, month) {
+
+                        $that.find("strong").text(`${year}年${month}月`);
+
+
+                        // 根据用户输入的月份，改为 代码识别的月份
+                        // 该月一号的星期数
+                        var day = new Date(year, month - 1, 1).getDay();
+                        // 求下个月的第一天的前一天的日期
+                        // 该月的天数
+                        var days = new Date(year, month, 0).getDate();
+                        console.log(day, days);
+
+                        // 
+                        // $("td").eq(day).text(1);
+                        // $("td").eq(day + 1).text(1 + 1);
+
+                        $("td").each(function(index, val) {
+                            // 清除当前td  的文本
+                            $(this).empty();
+
+                            // 判断是否显示日期
+
+                            // td  的下标和   日期的关系为  下标-第一天的星期数+1  = 日期
+                            if (index >= day && index < day + days) {
+                                $(this).text(index - day + 1);
+                            }
+                        });
+
+                        // 根据第六行的第一天是否有日期来决定这一行是否显示
+                        if ($("td").eq(35).text()) {
+                            $("td").eq(35).parent().show();
+                        } else {
+                            $("td").eq(35).parent().hide();
+                        }
+
+                    }
+                }
+            });
+
+            $("#wrapper").data({
+                month: 1
+            });
+        });
+    </script>
+</body>
+
+</html四
